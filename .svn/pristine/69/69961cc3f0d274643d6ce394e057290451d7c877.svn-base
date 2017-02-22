@@ -1,0 +1,11 @@
+package com.xdja.zdsb.utils;
+
+public class Constant {
+    public static int MAX_WIDTH = 2048;
+
+    public static int MAX_HEIGHT = 1536;
+
+    public static final String DEVCODE="6YOR5BEE5LAH5AS";
+
+    public static final String DEVELOP_CODE = "6YOR5BEE5LAH5AS";
+}

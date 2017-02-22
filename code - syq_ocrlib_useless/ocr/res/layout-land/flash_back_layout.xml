@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <LinearLayout
+        android:id="@+id/idcard_botton_lyaout"
+        android:layout_width="100dp"
+        android:layout_height="match_parent"
+        android:background="@color/operBarBackgroud1"
+        android:gravity="center"
+        android:orientation="vertical">"
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <ImageButton
+                android:id="@+id/light_on"
+                android:layout_width="51dp"
+                android:layout_height="51dp"
+                android:padding="30dp"
+				
+                android:background="@drawable/flash_on_selector"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <ImageButton
+                android:id="@+id/backbtn"
+                android:layout_width="51dp"
+                android:layout_height="51dp"
+                android:padding="30dp"
+                android:background="@drawable/back_selector" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,21 @@
+package com.ocrlib.zdsb.view;
+
+import com.ocrlib.zdsb.utils.Zzlog;
+
+import android.content.Intent;
+import android.os.Bundle;
+
+public class DriverLicenseActivity extends IDCardRecognizeActivity {
+
+    private static final String TAG = "DriverLicenseActivity";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        
+        Zzlog.out(TAG, "onCreate(Bundle savedInstanceState)");
+        Intent intent = getIntent();
+        // 5
+        intent.putExtra("nMainId", 5);
+    }
+}

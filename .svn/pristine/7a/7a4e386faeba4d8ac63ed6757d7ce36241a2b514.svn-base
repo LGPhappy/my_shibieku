@@ -1,0 +1,15 @@
+OCR: Optical Character Recognition
+
+intent-filter:   passport:
+com.xdja.zdsb.passport.action
+
+idcard: 
+com.xdja.zdsb.sfzsb.action
+
+driverLicense:
+com.xdja.zdsb.sfzsb.action
+
+car plate number:
+com.xdja.zdsb.cpsb.action
+
+

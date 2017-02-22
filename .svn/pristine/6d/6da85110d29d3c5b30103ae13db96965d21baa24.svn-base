@@ -1,0 +1,160 @@
+package com.xdja.zdsb.utils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
+import android.hardware.Camera;
+import android.hardware.Camera.Size;
+import android.util.Log;
+
+public class CameraUtil {
+
+    private static final String TAG = "zdsb_camera";
+
+    public static void checkCameraParameters(int srcwidth, int srcheight, int WIDTH, int HEIGHT) {
+	// 读取支持的预览尺寸
+	Camera camera = null;
+	try {
+	    camera = Camera.open();
+	    if (camera != null) {
+		// 读取支持的预览尺寸,优先选择640后320
+		Camera.Parameters parameters = camera.getParameters();
+		List<Integer> SupportedPreviewFormats = parameters.getSupportedPreviewFormats();
+		for (int i = 0; i < SupportedPreviewFormats.size(); i++) {
+		    System.out.println("PreviewFormats=" + SupportedPreviewFormats.get(i));
+		}
+		Log.i(TAG, "preview-size-values:" + parameters.get("preview-size-values"));
+		List<Camera.Size> previewSizes = splitSize(parameters.get("preview-size-values"), camera);// parameters.getSupportedPreviewSizes();
+
+		// 冒泡排序算法 实现分辨率从小到大排列
+		// 该算法以分辨率的宽度为准，如果宽度相等，则判断高度
+		int tempWidth = 0;
+		int tempHeight = 0;
+		for (int i = 0; i < previewSizes.size(); i++) {
+		    for (int j = i + 1; j < previewSizes.size(); j++) {
+			if (previewSizes.get(i).width > previewSizes.get(j).width) {
+			    tempWidth = previewSizes.get(i).width;
+			    tempHeight = previewSizes.get(i).height;
+			    previewSizes.get(i).width = previewSizes.get(j).width;
+			    previewSizes.get(i).height = previewSizes.get(j).height;
+			    previewSizes.get(j).width = tempWidth;
+			    previewSizes.get(j).height = tempHeight;
+
+			} else if (previewSizes.get(i).width == previewSizes.get(j).width
+				&& previewSizes.get(i).height > previewSizes.get(j).height) {
+			    tempWidth = previewSizes.get(i).width;
+			    tempHeight = previewSizes.get(i).height;
+			    previewSizes.get(i).width = previewSizes.get(j).width;
+			    previewSizes.get(i).height = previewSizes.get(j).height;
+			    previewSizes.get(j).width = tempWidth;
+			    previewSizes.get(j).height = tempHeight;
+			}
+		    }
+		}
+		for (int i = 0; i < previewSizes.size(); i++) {
+		    System.out.println("宽度:" + previewSizes.get(i).width + "--" + "高度:" + previewSizes.get(i).height);
+		}
+		// 冒泡排序算法
+		// 该段程序主要目的是为了遵循:优先选择比640*480大的并且是最接近的而且是比例为4:3的原则编写的。
+		for (int i = 0; i < previewSizes.size(); i++) {
+		    // 当预览宽度和高度分别大于640和480并且宽和高的比为4:3时。
+		    if (previewSizes.get(i).width > 640 && previewSizes.get(i).height > 480
+			    && (((float) previewSizes.get(i).width / previewSizes.get(i).height) == (float) 4 / 3)) {
+			WIDTH = previewSizes.get(i).width;
+			HEIGHT = previewSizes.get(i).height;
+			break;
+		    }
+		    // 如果在640*480前没有满足的值，WIDTH和HEIGHT就都为0，然后进行如下判断，看是否有640*480，如果有则赋值，如果没有则进行下一步验证。
+		    if (previewSizes.get(i).width == 640 && previewSizes.get(i).height == 480 && WIDTH < 640
+			    && HEIGHT < 480) {
+			WIDTH = 640;
+			HEIGHT = 480;
+		    }
+		    if (previewSizes.get(i).width == 320 && previewSizes.get(i).height == 240 && WIDTH < 320
+			    && HEIGHT < 240) {// 640 //480
+			WIDTH = 320;
+			HEIGHT = 240;
+		    }
+		}
+		// 读取支持的相机尺寸,优先选择1280后1600后2048
+		List<Integer> SupportedPictureFormats = parameters.getSupportedPictureFormats();
+		for (int i = 0; i < SupportedPictureFormats.size(); i++) {
+		    System.out.println("PictureFormats=" + SupportedPictureFormats.get(i));
+		}
+		Log.i(TAG, "picture-size-values:" + parameters.get("picture-size-values"));
+		List<Camera.Size> PictureSizes = splitSize(parameters.get("picture-size-values"), camera);// parameters.getSupportedPictureSizes();
+		for (int i = 0; i < PictureSizes.size(); i++) {
+		    // if (PictureSizes.get(i).width == 3264
+		    // && PictureSizes.get(i).height == 1840) {
+		    // // 优先选择小的照片分辨率
+		    // isCatchPicture = true;
+		    // srcwidth = 3264;
+		    // srcheight = 1840;
+		    // }
+		    if (PictureSizes.get(i).width == 2048 && PictureSizes.get(i).height == 1536) {
+			// 优先选择小的照片分辨率
+			if ((srcwidth == 0 && srcheight == 0) || (srcwidth > 2048 && srcheight > 1536)) {
+			    srcwidth = 2048;
+			    srcheight = 1536;
+			}
+
+		    }
+		    if (PictureSizes.get(i).width == 1600 && PictureSizes.get(i).height == 1200) {
+			if ((srcwidth == 0 && srcheight == 0) || (srcwidth > 1600 && srcheight > 1200)) {
+			    srcwidth = 1600;
+			    srcheight = 1200;
+			}
+
+		    }
+		    if (PictureSizes.get(i).width == 1280 && PictureSizes.get(i).height == 960) {
+			if ((srcwidth == 0 && srcheight == 0) || (srcwidth > 1280 && srcheight > 960)) {
+			    srcwidth = 1280;
+			    srcheight = 960;
+			}
+		    }
+		}
+	    }
+	    camera.release();
+	    camera = null;
+	} catch (Exception e) {
+	    e.printStackTrace();
+	} finally {
+	    if (camera != null) {
+		try {
+		    camera.release();
+		    camera = null;
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
+	    }
+	}
+    }
+
+    private static ArrayList<Size> splitSize(String str, Camera camera) {
+	if (str == null)
+	    return null;
+	StringTokenizer tokenizer = new StringTokenizer(str, ",");
+	ArrayList<Size> sizeList = new ArrayList<Size>();
+	while (tokenizer.hasMoreElements()) {
+	    Size size = strToSize(tokenizer.nextToken(), camera);
+	    if (size != null)
+		sizeList.add(size);
+	}
+	if (sizeList.size() == 0)
+	    return null;
+	return sizeList;
+    }
+
+    private static Size strToSize(String str, Camera camera) {
+	if (str == null)
+	    return null;
+	int pos = str.indexOf('x');
+	if (pos != -1) {
+	    String width = str.substring(0, pos);
+	    String height = str.substring(pos + 1);
+	    return camera.new Size(Integer.parseInt(width), Integer.parseInt(height));
+	}
+	return null;
+    }
+}

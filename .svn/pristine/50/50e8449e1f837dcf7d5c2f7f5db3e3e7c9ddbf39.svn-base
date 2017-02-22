@@ -1,0 +1,189 @@
+package com.xdja.zdsb;
+
+import java.io.File;
+
+import com.xdja.zdsb.utils.AuthInterface;
+import com.xdja.zdsb.utils.AuthTools;
+import com.xdja.zdsb.utils.FileUtils;
+import com.xdja.zdsb.utils.PictureRecognize;
+import com.xdja.zdsb.utils.Zzlog;
+import com.xdja.zdsb.view.CarPlateActivity;
+import com.xdja.zdsb.view.DriverLicenseActivity;
+import com.xdja.zdsb.view.IDCardRecognizeActivity;
+import com.xdja.zdsb.view.PassportActivity;
+import com.xdja.zdsb.view.PictureRecognizeActivity;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+
+public class MainActivity extends Activity {
+
+    private static final String TAG = "MainActivity";
+
+    private static final int CAR_PLATE_REQUEST = 1;
+
+    private static final int ID_CARD_REQUEST = 2;
+
+    private static final int DRIVER_LICENSE_REQUEST = 3;
+
+    private static final int PASSPORT_REQUEST = 4;
+
+    private static final int TAKE_PHOTO_WITH_DATA = 5;
+
+    private static final int GET_IMAGE_ON_DEVICE = 6;
+
+    private String takePicFilename;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.ocr_activity_main);
+    }
+
+    private void authProcess() {
+        Zzlog.out(TAG, "authProcess()");
+        final AuthTools authTools = new AuthTools(this, authInterface);
+        authTools.start();
+    }
+
+    public void onCarPlateLayout(View view) {
+        Zzlog.out(TAG, "onCarPlateLayout");
+        Intent intent = new Intent(this, CarPlateActivity.class);
+        startActivityForResult(intent, CAR_PLATE_REQUEST);
+    }
+
+    public void onIDCardLayout(View view) {
+        Intent intent = new Intent(this, IDCardRecognizeActivity.class);
+        startActivityForResult(intent, ID_CARD_REQUEST);
+        Zzlog.out(TAG, "onIDCardLayout");
+    }
+
+    public void onDriverLicenseLayout(View view) {
+        Intent intent = new Intent(this, DriverLicenseActivity.class);
+        startActivityForResult(intent, DRIVER_LICENSE_REQUEST);
+        Zzlog.out(TAG, "onDriverLisenceLayout");
+    }
+
+    public void onPassportLayout(View view) {
+        Zzlog.out(TAG, "onPassportLayout");
+        Intent intent = new Intent(this, PassportActivity.class);
+        startActivityForResult(intent, PASSPORT_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+            case CAR_PLATE_REQUEST:
+                String number = null;
+                try {
+                    number = data.getStringExtra("number");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Zzlog.out(TAG, "number = " + number);
+                break;
+            case ID_CARD_REQUEST:
+            case DRIVER_LICENSE_REQUEST:
+            case PASSPORT_REQUEST:
+                String result = null;
+                try {
+                    result = data.getStringExtra("data");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Zzlog.out(TAG, "DRIVER_LICENSE_REQUEST number = " + result);
+
+                break;
+
+            case TAKE_PHOTO_WITH_DATA:
+                Zzlog.out(TAG, "Image saved to:" + takePicFilename);
+                File file = new File(takePicFilename);
+                if (file.exists()) {
+
+                    // car plate:
+                    Intent intent = new Intent(this, PictureRecognizeActivity.class);
+                    intent.putExtra("picture", PictureRecognize.CAR_PLATE);
+                    intent.putExtra("path", takePicFilename);
+                    startActivity(intent);
+                }
+                break;
+
+            default:
+                Zzlog.out(TAG, "onActivityResult default: requestCode + "
+                          + requestCode + ", resultCode = " + resultCode
+                        + ", data = " + data);
+            }
+        }
+
+    }
+
+    AuthInterface authInterface = new AuthInterface() {
+
+        @Override
+        public void onAuthSucceed() {
+            Zzlog.out(TAG, "onAuthSucceed()");
+        }
+
+        @Override
+        public void onAuthFailed() {
+            Zzlog.out(TAG, "onAuthFailed()");
+        }
+    };
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+        if (id == R.id.action_take_pic) {
+            takePic();
+            return true;
+        }
+
+        if (id == R.id.action_choose_pic) {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(intent, GET_IMAGE_ON_DEVICE);
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void takePic() {
+
+        // Intent intent = new Intent(this, PictureRecognizeActivity.class);
+        // startActivity(intent);
+
+        Zzlog.out(TAG, "takePic()");
+
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);// create a intent
+                                                             // to take picture
+        takePicFilename = FileUtils.getStringFileName(FileUtils.MEDIA_TYPE_IMAGE);
+        
+        Zzlog.out(TAG, "takePic() takePicFilename = " + takePicFilename);
+
+        Uri fileUri = Uri.fromFile(new File(takePicFilename));
+
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file
+
+        startActivityForResult(intent, TAKE_PHOTO_WITH_DATA);
+    }
+
+}

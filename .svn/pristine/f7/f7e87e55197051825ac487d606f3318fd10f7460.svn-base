@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.xdja.zdsb"
+    android:versionCode="7"
+    android:versionName="1.7" >
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="19" />
+
+    <!-- 读取机器各种ID的权限 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <!-- 访问internet权限 -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- 访问震动权限 -->
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <!-- 往SDCard写入数据权限 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!-- 在SDCard中创建与删除文件权限 -->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+    <!-- 关闭该包下的所有应用程序 -->
+    <uses-permission android:name="android.permission.RESTART_PACKAGES"/>
+    <!-- 获取机型信息权限 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
+    <uses-feature android:name="android.hardware.camera"/>
+    <uses-feature android:name="android.hardware.camera.autofocus"/>
+
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.FLASHLIGHT"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.CHANGE_CONFIGURATION"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    
+    <application
+        android:allowBackup="true"
+        android:name="BaseApplication"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.xdja.zdsb.MainActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <!-- -<action android:name="android.intent.action.MAIN" /> 
+                <category android:name="android.intent.category.LAUNCHER" />-->
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="wintone.idcard.android.IDCardBean"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="landscape" >
+            <intent-filter>
+                <action android:name="wintone.idcard" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        
+        <activity
+            android:name="com.xdja.zdsb.view.PictureRecognizeActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/app_name" >
+
+            <intent-filter>
+                <action android:name="com.xdja.zdsb.picture.action" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </activity>
+
+        <activity
+            android:name="com.xdja.zdsb.view.TakePhotoCameraActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/app_name" >
+        </activity>
+
+        <activity
+            android:name="com.xdja.zdsb.view.CameraIDCardNoActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/app_name" >
+        </activity>
+
+        <activity
+            android:name="com.xdja.zdsb.view.PassportActivity"
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape" >
+            <intent-filter>
+                <action android:name="com.xdja.zdsb.passport.action" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        
+        <activity
+            android:name="com.xdja.zdsb.view.DriverLicenseActivity"
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape" >
+            <intent-filter>
+                <action android:name="com.xdja.zdsb.jszsb.action" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.xdja.zdsb.view.IDCardRecognizeActivity"
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="com.xdja.zdsb.sfzsb.action" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.xdja.zdsb.view.CarPlateActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="com.xdja.zdsb.cpsb.action" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        
+        <activity
+            android:name="com.xdja.zdsb.AboutActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name" >
+        </activity>
+        
+
+        <!-- win_tone service  -->
+        <service
+            android:name="com.wintone.plateid.AuthService"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="wintone.plateid.authservice"/>
+            </intent-filter>
+        </service>
+
+        <!-- vehicle plate -->
+        <service
+            android:name="com.wintone.plateid.RecogService"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="wintone.plateid.recogService" />
+            </intent-filter>
+        </service>
+        
+        <!-- id card and license -->
+        <service
+            android:name="wintone.idcard.android.RecogService"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="wintone.idcard.recogService" />
+            </intent-filter>
+        </service>
+    </application>
+
+    
+</manifest>

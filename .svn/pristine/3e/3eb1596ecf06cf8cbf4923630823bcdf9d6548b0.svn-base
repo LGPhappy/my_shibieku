@@ -1,0 +1,232 @@
+package com.xdja.ocrjar.core;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Environment;
+import android.os.StatFs;
+import android.util.Log;
+
+public class FileUtils {
+
+    private static final String TAG = "FileAccess";
+    
+    public static String PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
+
+    public static final int MEDIA_TYPE_IMAGE = 1;
+
+    public static boolean Move(File srcFile, String destPath) {
+        // Destination directory
+        File dir = new File(destPath);
+
+        // Move file to new directory
+        boolean success = srcFile.renameTo(new File(dir, srcFile.getName()));
+
+        return success;
+    }
+
+    public static boolean Move(String srcFile, String destPath) {
+        // File (or directory) to be moved
+        File file = new File(srcFile);
+
+        // Destination directory
+        File dir = new File(destPath);
+
+        // Move file to new directory
+        boolean success = file.renameTo(new File(dir, file.getName()));
+
+        return success;
+    }
+
+    public static void Copy(String oldPath, String newPath) {
+        try {
+            int bytesum = 0;
+            int byteread = 0;
+            File oldfile = new File(oldPath);
+            if (oldfile.exists()) {
+                InputStream inStream = new FileInputStream(oldPath);
+                FileOutputStream fs = new FileOutputStream(newPath);
+                byte[] buffer = new byte[1444];
+                int length;
+                while ((byteread = inStream.read(buffer)) != -1) {
+                    bytesum += byteread;
+                    System.out.println(bytesum);
+                    fs.write(buffer, 0, byteread);
+                }
+                inStream.close();
+            }
+        } catch (Exception e) {
+            System.out.println("error  ");
+            e.printStackTrace();
+        }
+    }
+
+    public static void Copy(File oldfile, String newPath) {
+        try {
+            int bytesum = 0;
+            int byteread = 0;
+            // File oldfile = new File(oldPath);
+            if (oldfile.exists()) {
+                InputStream inStream = new FileInputStream(oldfile);
+                FileOutputStream fs = new FileOutputStream(newPath);
+                byte[] buffer = new byte[1444];
+                while ((byteread = inStream.read(buffer)) != -1) {
+                    bytesum += byteread;
+                    System.out.println(bytesum);
+                    fs.write(buffer, 0, byteread);
+                }
+                inStream.close();
+            }
+        } catch (Exception e) {
+            System.out.println("error  ");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * copy assets files form folder.
+     * 
+     * @param context Context
+     * @param oldPath String
+     * @param newPath String
+     */
+    public static void copyFilesFromAssets(Context context, String oldPath, String newPath) {
+        try {
+            //get file list
+            String fileNames[] = context.getAssets().list(oldPath);
+            if (fileNames.length > 0) { // is directory
+                File file = new File(newPath);
+                file.mkdirs(); 
+                for (String fileName : fileNames) {
+                    copyFilesFromAssets(context, oldPath + "/" + fileName,
+                            newPath + "/" + fileName);
+                }
+            } else {// is file.
+                InputStream is = context.getAssets().open(oldPath);
+                File desfile = new File(newPath);
+
+                FileOutputStream fos = new FileOutputStream(desfile);
+                byte[] buffer = new byte[1024];
+                int byteCount = 0;
+                while ((byteCount = is.read(buffer)) != -1) {// read buffer form
+                    fos.write(buffer, 0, byteCount);// write buffer.
+                }
+                fos.flush();
+                is.close();
+                fos.close();
+            }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Log.i(TAG, "copyFilesFassets failed!");
+        }
+    }
+
+    public static String  writeJpgFile(byte[] data) {
+        String sdpath = Environment.getExternalStorageDirectory().getAbsolutePath();
+
+        String path = sdpath + "/DCIM/pic_" + System.currentTimeMillis() + ".jpg";
+
+        return writeDataTofile(data, path);
+    }
+
+    public static String writeDataTofile(byte[] data, String filename) {
+        try {
+            if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                String storage = Environment.getExternalStorageDirectory().toString();
+                StatFs fs = new StatFs(storage);
+                long available = fs.getAvailableBlocks() * fs.getBlockSize();
+                if (available < data.length) {
+                    return null;
+                }
+                File file = new File(filename);
+                file.createNewFile();
+                FileOutputStream fos = new FileOutputStream(file);
+                fos.write(data);
+                fos.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return filename;
+    }
+    
+
+
+    public static String savePicture(String filename, Bitmap bitmap) {
+
+        String strCaptureFilePath = filename;
+
+        File file = new File(strCaptureFilePath);
+        if (file.exists()) {
+            file.delete();
+        }
+        try {
+            file.createNewFile();
+            BufferedOutputStream bos = new BufferedOutputStream(
+                    new FileOutputStream(file));
+
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+            bos.flush();
+            bos.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return strCaptureFilePath;
+    }
+
+    
+
+    public static String getStringFileName(int type) {
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+        String filename = null;
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "DCIM");
+        
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Zzlog.out(TAG, "failed to create directory");
+                return filename;
+            }
+        }
+
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        if (type == MEDIA_TYPE_IMAGE) {
+            filename = mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg";
+        }
+        return filename;
+    }
+
+    public static byte[] getFileData(String filename) throws IOException {
+        byte[] data = null;
+
+        File file = new File(filename);
+        if (file.exists()) {
+            InputStream is = new FileInputStream(file);
+            int length = is.available();
+            data = new byte[length];
+            Zzlog.out(TAG, "file length = " + length);
+            is.read(data);
+        };
+
+        return data;
+    }
+
+}

@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="libs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/code/ocr/libs/idcard_sdk.jar!/" />
+      <root url="jar://$PROJECT_DIR$/code/ocr/libs/ksoap2-android-assembly-2.4-jar-with-dependencies.jar!/" />
+      <root url="jar://$PROJECT_DIR$/code/ocr/libs/plate_id_sdk.jar!/" />
+      <root url="jar://$PROJECT_DIR$/code/ocr/libs/bcprov-ext-jdk15-146.jar!/" />
+      <root url="jar://$PROJECT_DIR$/code/ocr/libs/pki.jar!/" />
+      <root url="jar://$PROJECT_DIR$/code/ocr/libs/android_auth.jar!/" />
+      <root url="jar://$PROJECT_DIR$/code/ocr/libs/android-support-v4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

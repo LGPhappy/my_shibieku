@@ -1,7 +1,0 @@
-package com.xdja.zdsb.utils;
-
-
-public interface RecognizerInterface {
-    public void onRecognizeSucceed(String result);
-    public void onRecognizeFailed();
-}
